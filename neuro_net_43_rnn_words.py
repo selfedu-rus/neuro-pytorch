@@ -1,6 +1,8 @@
-from navec import Navec
+import os
+import numpy as np
 import re
 
+from navec import Navec
 from tqdm import tqdm
 import torch
 import torch.utils.data as data
@@ -24,10 +26,11 @@ class WordsDataset(data.Dataset):
 
         self.words = self.text.lower().split()
         self.words = [word for word in self.words if word in self.navec_emb] # оставляем слова, которые есть в словаре
+        self.vocab = set(self.words)
 
-        self.int_to_word = dict(enumerate(self.words))
+        self.int_to_word = dict(enumerate(sorted(self.vocab)))
         self.word_to_int = {b: a for a, b in self.int_to_word.items()}
-        self.vocab_size = len(self.words)
+        self.vocab_size = len(self.vocab)
 
     def __getitem__(self, item):
         _data = torch.vstack([torch.tensor(self.navec_emb[self.words[x]]) for x in range(item, item+self.prev_words)])
@@ -36,7 +39,7 @@ class WordsDataset(data.Dataset):
         return _data, t
 
     def __len__(self):
-        return self.vocab_size - 1 - self.prev_words
+        return len(self.words) - 1 - self.prev_words
 
 
 class WordsRNN(nn.Module):
@@ -88,9 +91,6 @@ for _e in range(epochs):
 
 st = model.state_dict()
 torch.save(st, 'model_rnn_words.tar')
-
-# st = torch.load('model_rnn_words.tar', weights_only=True)
-# model.load_state_dict(st)
 
 model.eval()
 predict = "подумал встал и снова лег".lower().split()
