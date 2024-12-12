@@ -26,11 +26,11 @@ class WordsDataset(data.Dataset):
 
         self.words = self.text.lower().split()
         self.words = [word for word in self.words if word in self.navec_emb] # оставляем слова, которые есть в словаре
-        self.vocab = set(self.words)
+        vocab = set(self.words)
 
-        self.int_to_word = dict(enumerate(sorted(self.vocab)))
+        self.int_to_word = dict(enumerate(vocab))
         self.word_to_int = {b: a for a, b in self.int_to_word.items()}
-        self.vocab_size = len(self.vocab)
+        self.vocab_size = len(vocab)
 
     def __getitem__(self, item):
         _data = torch.vstack([torch.tensor(self.navec_emb[self.words[x]]) for x in range(item, item+self.prev_words)])
