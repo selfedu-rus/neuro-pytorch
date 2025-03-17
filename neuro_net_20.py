@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 class DigitDataset(data.Dataset):
     def __init__(self, path, train=True, transform=None):
-        self.path = os.path.join(path, "train" if train else "test")
+        self.path = os.path.join(self.path, "train" if train else "test")
         self.transform = transform
 
         with open(os.path.join(path, "format.json"), "r") as fp:
