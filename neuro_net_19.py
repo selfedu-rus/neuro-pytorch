@@ -15,7 +15,7 @@ class DigitDataset(data.Dataset):
         self.path = os.path.join(path, "train" if train else "test")
         self.transform = transform
 
-        with open(os.path.join(path, "format.json"), "r") as fp:
+        with open(os.path.join(self.path, "format.json"), "r") as fp:
             self.format = json.load(fp)
 
         self.length = 0
