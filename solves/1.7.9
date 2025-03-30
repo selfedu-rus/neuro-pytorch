@@ -1,0 +1,10 @@
+import torch
+
+current_tm = int(input()) # переменную current_tm в программе не менять
+
+
+t_time = torch.empty(4, dtype=torch.int32)
+t_time[0] = current_tm
+t_time[1] = current_tm // 3600
+t_time[2] = current_tm % 3600 // 60
+t_time[3] = current_tm % 3600 % 60
