@@ -1,0 +1,3 @@
+import torch
+
+t_indx = torch.LongTensor(list(range(1, 65))).view(2, 32)
