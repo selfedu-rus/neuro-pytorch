@@ -1,0 +1,14 @@
+import torch
+
+# тензор X в программе не менять
+batch_size = 32 # количество входных данных
+X = torch.tensor(list(map(float, input().split())), dtype=torch.float32).view(batch_size, 2)
+
+W1 = torch.tensor([(4, -9), (4, -3), (3, 1)], dtype=torch.float32)
+bias1 = torch.tensor([41, 11, 18], dtype=torch.float32)
+W2 = torch.tensor([1, 1, 1], dtype=torch.float32)
+bias2 = torch.tensor([-2.5], dtype=torch.float32)
+
+h = torch.matmul(X, W1.transpose(1, 0)) + bias1
+h = torch.sign(h)
+predict = torch.sign(h @ W2 + bias2)
