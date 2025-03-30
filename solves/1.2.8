@@ -1,0 +1,15 @@
+import numpy as np
+
+x = list(map(int, input().split())) # чтение вектора [x1, x2, x3] из входного потока
+
+W1 = np.array([[0.3, 0.2, 0.5], [0.5, -0.1, -0.2]])
+W2 = np.array([[-1.5, 0.5]])
+b1 = np.array([[-1.5, 2]])
+b2 = np.array([[-1]])
+
+x = np.array([x])
+h = W1 @ x.T + b1.T
+u = np.array([[+1 if _x > 0 else -1 for _x in h]])
+y = W2 @ u.T + b2.T
+
+print(f"{y.item():.1f}") # вывод выходного значения y с точностью до десятых
