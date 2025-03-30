@@ -1,0 +1,11 @@
+import torch
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+w = torch.rand(1, 16) # вектор-строка
+X = torch.rand(16, 16) # матрица 16 x 16
+I = torch.eye(16) # единичная матрица 16 x 16
+lm = 0.5 # значение лямбда
+
+wT = w.transpose(1, 0)
+Q = w @ (X + I * lm) @ wT
