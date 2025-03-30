@@ -1,0 +1,60 @@
+import torch
+import torch.utils.data as data
+import torch.nn as nn
+import torch.optim as optim
+
+
+class MyNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.layer1 = nn.Linear(64, 64)
+        self.layer2 = nn.Linear(64, 32)
+        self.layer3 = nn.Linear(32, 10)        
+        self.dropout = nn.Dropout1d(0.3)
+
+    def forward(self, x):
+        x = self.layer1(x)
+        x = torch.relu(x)
+        x = self.dropout(x)
+        
+        x = self.layer2(x)
+        x = torch.relu(x)
+        x = self.dropout(x)
+        
+        x = self.layer3(x)
+        return x
+
+
+model = MyNN()
+
+ds = data.TensorDataset(_global_var_data_x, _global_var_target)
+
+d_train, d_test = data.random_split(ds, [0.7, 0.3])
+train_data = data.DataLoader(d_train, batch_size=16, shuffle=True)
+test_data = data.DataLoader(d_test, batch_size=len(d_test), shuffle=False)    
+
+optimizer = optim.Adam(params = model.parameters(), lr = 0.01, weight_decay=0.1)
+loss_func = nn.CrossEntropyLoss()
+
+epochs = 2
+
+model.train()
+
+for _e in range(epochs):
+    for x_train, y_train in train_data:
+        predict = model(x_train)
+        loss = loss_func(predict, y_train)
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+model.eval()
+
+with torch.no_grad():
+    x_test, y_test = next(iter(test_data))
+    predict = model(x_test) 
+    predict = torch.argmax(predict, dim=1)
+
+Q = (predict == y_test).float().mean()
+Q = Q.item()
