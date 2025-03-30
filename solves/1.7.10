@@ -1,0 +1,7 @@
+import torch
+
+lst = list(map(int, input().split())) # список lst в программе не менять
+
+targets = torch.tensor(lst, dtype=torch.int32)
+n = max(lst)+1
+t_onehot = torch.eye(n, dtype=torch.int8)[lst]
