@@ -1,0 +1,12 @@
+import torch
+
+# списки lst_1 и lst_2 в программе не менять
+lst_1 = list(map(int, input().split()))
+lst_2 = list(map(int, input().split()))
+
+t1 = torch.tensor(lst_1, dtype=torch.int32)
+t2 = torch.tensor(lst_2, dtype=torch.int32)
+
+t2_size = t2.size(0)
+t1[1:1+t2_size] = t2
+print(*map(lambda _x: _x.item(), t1))
