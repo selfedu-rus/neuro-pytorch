@@ -1,0 +1,11 @@
+import numpy as np
+
+x = list(map(int, input().split())) # чтение вектора [x1, x2] из входного потока
+
+W1 = np.array([[0.5, 0.5, -1]])
+b1 = np.array([[2.5]])
+
+x = np.array([x + [x[0] * x[1]]])
+y = W1 @ x.T + b1
+
+print(f"{y.item():.1f}") # вывод выходного значения y с точностью до десятых
