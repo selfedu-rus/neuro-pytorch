@@ -1,0 +1,56 @@
+import torch
+import torch.utils.data as data
+import torch.nn as nn
+import torch.optim as optim
+
+
+class DigitNN(nn.Module):
+    def __init__(self, input_dim):
+        super().__init__()
+        self.layer1 = nn.Linear(input_dim, 32, bias=False)
+        self.layer2 = nn.Linear(32, 20, bias=False)
+        self.layer3 = nn.Linear(20, 1)
+        self.bm1 = nn.BatchNorm1d(32)
+        self.bm2 = nn.BatchNorm1d(20)
+
+    def forward(self, x):
+        x = self.layer1(x)
+        x = nn.functional.relu(x)
+        x = self.bm1(x)
+        x = self.layer2(x)
+        x = nn.functional.relu(x)
+        x = self.bm2(x)
+        x = self.layer3(x)
+        return x
+
+
+model = DigitNN(30)
+
+ds = data.TensorDataset(_global_var_data_x, _global_var_target.float())
+d_train, d_test = data.random_split(ds, [0.7, 0.3])
+train_data = data.DataLoader(d_train, batch_size=16, shuffle=True)
+test_data = data.DataLoader(d_test, batch_size=len(d_test), shuffle=False)
+
+optimizer = optim.Adam(params=model.parameters(), lr=0.01)
+loss_func = nn.BCEWithLogitsLoss()
+epochs = 5
+model.train()
+
+for _e in range(epochs):
+    for x_train, y_train in train_data:
+        predict = model(x_train)
+        loss = loss_func(predict, y_train.unsqueeze(-1))
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+# тестирование обученной НС
+model.eval()
+
+x_test, y_test = next(iter(test_data))
+with torch.no_grad():
+    p = model(x_test)
+    Q = torch.sum(torch.sign(p.flatten()) == (2 * y_test.flatten() - 1)).item()
+
+Q /= len(d_test)
