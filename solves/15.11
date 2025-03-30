@@ -1,0 +1,5 @@
+import torch
+
+
+tr = torch.IntTensor(list(range(-10, 10, 2))).view(5, 2)
+tr_t = tr.permute(1, 0)
