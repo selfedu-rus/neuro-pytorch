@@ -1,0 +1,31 @@
+import torch
+import torch.nn as nn
+
+class MyModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.input = nn.Linear(64, 32)
+        self.act = nn.ReLU(inplace=True)
+        self.output = nn.Linear(32, 10)
+
+        self.blocks = nn.ModuleDict({
+            'block_1': nn.Sequential(nn.Linear(32, 32, bias=False), nn.ELU(), nn.BatchNorm1d(32)),
+            'block_2': nn.Sequential(nn.Linear(32, 32), nn.ReLU(), nn.Dropout1d(0.4))
+        })
+
+    def forward(self, x, type_block='block_1'):
+        block = self.blocks[type_block] if type_block in self.blocks else self.blocks['block_1']
+        x = self.input(x)
+        x = self.act(x)
+        x = block(x)
+        x = self.output(x)
+        return x
+
+
+batch_size = 100
+x = torch.rand(batch_size, 64)
+
+model = MyModel()
+model.eval()
+
+predict = model(x, 'block_2')
