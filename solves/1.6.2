@@ -1,0 +1,8 @@
+import torch
+
+lst = list(map(float, input().split())) # список в программе не менять
+
+
+tr = torch.tensor(lst, dtype=torch.float32)
+tr_2 = tr[::2]
+print(*map(lambda _x: f"{_x.item():.1f}", tr_2))
