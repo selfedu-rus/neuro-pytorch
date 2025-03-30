@@ -1,0 +1,14 @@
+import torch
+
+# списки в программе не менять
+lst_1 = list(map(int, input().split()))
+lst_2 = list(map(int, input().split()))
+
+tr_1 = torch.tensor(lst_1, dtype=torch.int32)
+tr_2 = torch.tensor(lst_2, dtype=torch.int32)
+
+sz = tr_1.size(0) if (tr_1.size(0) < tr_2.size(0)) else tr_2.size(0)
+tr_1.resize_(sz)
+tr_2.resize_(sz)
+
+tr_1 = tr_1 ** tr_2
