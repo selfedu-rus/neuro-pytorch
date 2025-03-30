@@ -1,0 +1,77 @@
+import torch
+import torch.utils.data as data
+import torch.nn as nn
+import torch.optim as optim
+
+
+class FuncModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # модель однослойной полносвязной нейронной сети:
+        # 1-й слой: число входов 5 (x, x^2, x^3, x^4, x^5), число нейронов 1
+        self.layer = nn.Linear(5, 1)
+
+    def forward(self, x):
+        x.unsqueeze_(-1)
+        xx = torch.cat([x, x ** 2, x ** 3, x ** 4, x ** 5], dim=1)
+        y = self.layer(xx)
+        return y
+
+
+torch.manual_seed(1)
+
+model = FuncModel()
+
+epochs = 20 # число эпох обучения
+batch_size = 16 # размер батча
+
+data_x = torch.arange(-5, 5, 0.05) #тензоры data_x, data_y не менять
+data_y = torch.sin(2 * data_x) - 0.3 * torch.cos(8 * data_x) + 0.1 * data_x ** 2
+
+ds = data.TensorDataset(data_x, data_y) # создание dataset
+d_train, d_val = data.random_split(ds, [0.7, 0.3])
+train_data = data.DataLoader(d_train, batch_size=batch_size, shuffle=True)
+train_data_val = data.DataLoader(d_val, batch_size=batch_size, shuffle=False)
+
+optimizer = optim.RMSprop(params=model.parameters(), lr=0.01)
+loss_func = nn.MSELoss()
+
+loss_lst_val = []  # список значений потерь при валидации
+loss_lst = []  # список значений потерь при обучении
+
+for _e in range(epochs):
+    model.train()
+    loss_mean = 0
+    lm_count = 0
+
+    for x_train, y_train in train_data:
+        predict = model(x_train)
+        loss = loss_func(predict, y_train.unsqueeze(-1))
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        lm_count += 1
+        loss_mean = 1 / lm_count * loss.item() + (1 - 1 / lm_count) * loss_mean
+
+    # валидация модели
+    model.eval()
+    Q_val = 0
+    count_val = 0
+
+    for x_val, y_val in train_data_val:
+        with torch.no_grad():
+            p = model(x_val)
+            loss = loss_func(p, y_val.unsqueeze(-1))
+            Q_val += loss.item()
+            count_val += 1
+
+    Q_val /= count_val
+
+    loss_lst.append(loss_mean)
+    loss_lst_val.append(Q_val)
+
+model.eval()
+p = model(data_x)
+Q = loss_func(p, data_y.unsqueeze(-1)).item()
