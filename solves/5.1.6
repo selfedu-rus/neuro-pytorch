@@ -1,0 +1,54 @@
+import torch
+import torch.nn as nn
+import torch.utils.data as data
+import torch.optim as optim
+
+
+class AutoEncoder(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.encoder = nn.Sequential(
+            nn.Linear(8, 16),
+            nn.ReLU(inplace=True),
+            nn.Linear(16, 4),
+            nn.ReLU(inplace=True),
+            nn.Linear(4, 2),
+            nn.Tanh(),
+        )
+
+        self.decoder = nn.Sequential(
+            nn.Linear(2, 4),
+            nn.ReLU(inplace=True),
+            nn.Linear(4, 8),
+        )
+
+    def forward(self, x):
+        h = self.encoder(x)
+        return self.decoder(h), h
+
+
+total = 1000 # размер выборки
+data_x = torch.rand(total, 8) # обучающие данные
+ds = data.TensorDataset(data_x, data_x)
+train_data = data.DataLoader(ds, batch_size=16, shuffle=True)
+
+model = AutoEncoder()
+
+optimizer = optim.RMSprop(params=model.parameters(), lr=0.01, weight_decay=0.0001)
+loss_func = nn.MSELoss()
+
+epochs = 5
+model.train()
+
+for _e in range(epochs):
+    for x_train, y_train in train_data:
+        predict, _ = model(x_train)
+        loss = loss_func(predict, y_train)
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+model.eval()
+p, _ = model(data_x)
+Q = loss_func(p, data_x).item()
