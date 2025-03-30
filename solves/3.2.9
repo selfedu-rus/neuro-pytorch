@@ -1,0 +1,11 @@
+import torch
+import torch.nn as nn
+
+batch_size = 8 # размер батча
+C = 24         # число входных каналов
+H, W = 128, 86 # размеры карт признаков
+x = torch.randint(0, 255, (batch_size, C, H, W), dtype=torch.float32) # тензор x в программе не менять
+
+# здесь продолжайте программу
+lr = nn.AvgPool2d(3, 2)
+t_out = lr(x)
