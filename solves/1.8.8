@@ -1,0 +1,12 @@
+import torch
+
+# переменные lst и t_videos в программе не менять
+lst = list(map(int, input().split()))
+t_videos = torch.tensor(lst, dtype=torch.int32)
+
+t_median = torch.median(t_videos).item()
+t_mean = torch.mean(t_videos.float()).item()
+t_disp = t_videos.float().var().item()
+
+t_low_count = torch.sum(t_videos[t_videos < t_mean]).item()
+t_hi_count = torch.sum(t_videos[t_videos > t_mean]).item()
