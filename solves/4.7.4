@@ -1,0 +1,33 @@
+import torch
+import torch.nn as nn
+
+# здесь объявляйте класс модели
+class MyModelRNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.rnn_1 = nn.RNN(5, 7, batch_first=True, bidirectional=True)
+        self.output = nn.Linear(14, 2)
+
+    def forward(self, x):
+        y, _ = self.rnn_1(x)
+        n = y.size(1)
+        out = torch.empty(y.size(0), n, self.output.out_features)
+
+        for i in range(n):
+            out[:, i, :] = self.output(y[:, i, :])
+        return out
+    
+
+# тензор x в программе не менять
+batch_size = 4
+seq_length = 12
+d_size = 5
+x = torch.rand(batch_size, d_size)
+
+# здесь продолжайте программу
+model = MyModelRNN()
+model.eval()
+
+u = torch.zeros(batch_size, seq_length, d_size)
+u[:, 0, :] = x
+predict = model(u)
