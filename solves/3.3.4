@@ -1,0 +1,55 @@
+import torch
+import torch.nn as nn
+
+# здесь объявляйте класс ImageNormalize
+class ImageNormalize(nn.Module):
+    def forward(self, x):
+        a, b = torch.min(x), torch.max(x)
+        return (x - a) / (b - a)
+
+
+# генерация образов выборки
+total = 100 # размер выборки
+H, W = 32, 32 # размер изображений
+circle = torch.tensor([[0, 0, 0, 255, 255, 255, 255, 0, 0, 0],
+                       [0, 255, 255, 255, 255, 255, 255, 255, 255, 0],
+                       [0, 255, 255, 255, 255, 255, 255, 255, 255, 0],
+                       [255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+                       [255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+                       [255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+                       [255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+                       [0, 255, 255, 255, 255, 255, 255, 255, 255, 0],
+                       [0, 255, 255, 255, 255, 255, 255, 255, 255, 0],
+                       [0, 0, 0, 255, 255, 255, 255, 0, 0, 0]], dtype=torch.float32)
+Hc, Wc = circle.size()
+
+
+def _generate_img(_H, _W, _Hc, _Wc, _x, _y, _circle, _tr): # вспомогательная функция
+    img = torch.rand(_H, _W) * 20
+    img[_x:_x+_Hc, _y:_y+Wc] = _circle
+    return _tr(img.view(1, 1, _H, _W))
+
+
+transform = ImageNormalize()
+data_y = torch.tensor([(torch.randint(0, H-Hc, (1, )), torch.randint(0, W-Wc, (1, ))) for _ in range(total)])
+data_x = torch.cat([_generate_img(H, W, Hc, Wc, _x[0], _x[1], circle, transform) for _x in data_y], dim=0)
+
+# создайте модели и пропустите через нее выборку data_x
+torch.manual_seed(1)
+
+model = nn.Sequential(
+    nn.Conv2d(1, 16, 5, padding=2),
+    nn.ReLU(inplace=True),
+    nn.MaxPool2d(2),
+    nn.Conv2d(16, 32, 3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.MaxPool2d(2),
+    nn.Flatten(),
+    nn.Linear(2048, 2)
+)
+
+loss_func = nn.MSELoss()
+
+model.eval()
+p = model(data_x)
+Q = loss_func(p, data_y.float())
