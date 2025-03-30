@@ -1,0 +1,17 @@
+import torch
+
+# переменные lst и t_rect_lst в программе не менять
+lst = list(map(float, input().split()))
+t_rect_lst = torch.tensor(lst, dtype=torch.int32).view(-1, 2)
+
+t_rect_sq = torch.prod(t_rect_lst, dim=1)
+t_indx_min = torch.argmin(t_rect_sq)
+t_indx_max = torch.argmax(t_rect_sq)
+
+t_sum_sq = torch.sum(t_rect_sq).item()
+
+a, b = t_rect_lst[t_indx_min]
+t_min_per = (2 * (a + b)).item()
+
+a, b = t_rect_lst[t_indx_max]
+t_max_per = (2 * (a + b)).item()
