@@ -1,0 +1,86 @@
+import torch
+import torch.nn as nn
+import torch.utils.data as data
+import torch.optim as optim
+
+
+class WordsDataset(data.Dataset):
+    def __init__(self, navec_emb, prev_words=4):
+        self.prev_words = prev_words
+        self.navec_emb = navec_emb
+
+        self.lines = _global_var_text
+        self.vocab = set((" ".join(self.lines)).lower().split())
+        self.vocab_size = len(self.vocab)
+
+        data = []
+        targets = []
+
+        for t in self.lines:
+            words = t.lower().split()
+            for item in range(len(words)-self.prev_words):
+                data.append([self.navec_emb[words[x]].tolist() for x in range(item, item + self.prev_words)])
+                targets.append(self.navec_emb.vocab[words[item+self.prev_words]])
+
+        self.data = torch.tensor(data)
+        self.targets = torch.tensor(targets)
+
+        self.length = len(data)
+
+    def __getitem__(self, item):
+        return self.data[item], self.targets[item]
+
+    def __len__(self):
+        return self.length
+
+
+class WordsRNN(nn.Module):
+    def __init__(self, in_features, out_features):
+        super().__init__()
+        self.hidden_size = 16
+        self.in_features = in_features
+        self.out_features = out_features
+
+        self.rnn = nn.RNN(in_features, self.hidden_size, batch_first=True)
+        self.out = nn.Linear(self.hidden_size, out_features)
+
+    def forward(self, x):
+        x, h = self.rnn(x)
+        y = self.out(h)
+        return y
+    
+
+d_train = WordsDataset(global_navec)
+train_data = data.DataLoader(d_train, batch_size=8, shuffle=True)
+
+model = WordsRNN(100, len(global_navec.vocab))
+
+optimizer = optim.Adam(params=model.parameters(), lr=0.01, weight_decay=0.0001)
+loss_func = nn.CrossEntropyLoss()
+
+epochs = 1
+model.train()
+
+for _e in range(epochs):
+    for x_train, y_train in train_data:
+        predict = model(x_train).squeeze(0)
+        loss = loss_func(predict, y_train.long())
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+model.eval()
+predict = "Такими были первые нейронные сети предложенные".lower().split()
+total = 10
+
+int_to_word = dict(enumerate((global_navec.vocab)))
+for _ in range(total):
+    _data = torch.tensor([d_train.navec_emb[predict[-x]].tolist() for x in range(d_train.prev_words, 0, -1)])
+    with torch.no_grad():
+        p = model(_data.unsqueeze(0)).squeeze(0)
+    indx = torch.argmax(p, dim=1)
+    predict.append(int_to_word[indx.item()])
+
+predict = " ".join(predict)
+print(predict)
