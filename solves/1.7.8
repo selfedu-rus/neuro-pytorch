@@ -1,0 +1,7 @@
+import torch
+
+lst = list(map(int, input().split())) # список lst в программе не менять
+
+tr = torch.tensor(lst, dtype=torch.int32).view(2, -1)
+t_even = tr[0][tr[0] % 2 == 0]
+t_odd = tr[1][tr[1] % 2 != 0]
