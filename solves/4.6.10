@@ -1,0 +1,33 @@
+import torch
+import torch.nn as nn
+
+class MyModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.inp_2 = nn.Sequential(
+            nn.Linear(12, 12),
+            nn.Sigmoid()
+        )
+        self.out = nn.Sequential(
+            nn.Linear(12, 32),
+            nn.ReLU(),
+            nn.Linear(32, 1)
+        )
+        self.inp_1 = nn.Sequential(
+            nn.Linear(7, 12),
+            nn.Tanh()
+        )
+
+    def forward(self, a, b):
+        x1 = self.inp_1(a)
+        x2 = self.inp_2(b)
+        return self.out(x1 + x2)
+    
+    
+batch_size=12
+a = torch.rand(batch_size, 7) # тензоры a, b в программе не менять
+b = torch.rand(batch_size, 12)
+
+model = MyModel()
+model.eval()
+predict = model(a, b)
