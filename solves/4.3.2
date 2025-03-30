@@ -1,0 +1,19 @@
+import torch
+import torch.nn as nn
+
+sigma_x, sigma_y = 0.1, 0.15  # стандартные отклонения отсчетов последовательности
+rx, ry = 0.9, 0.99 # # коэффициенты регрессии
+sigma_noise_x = sigma_x * (1 - rx * rx) ** 0.5 # стандартное отклонение случайных величин
+sigma_noise_y = sigma_y * (1 - ry * ry) ** 0.5 # стандартное отклонение случайных величин
+
+total = 100 # длина генерируемой последовательности
+noise = torch.randn((total, 2)) # случайные величины, подаваемые на вход модели
+h0 = torch.randn((1, 2)) * torch.tensor([sigma_noise_x, sigma_noise_y]) # начальное значение вектора скрытого состояния
+
+# здесь продолжайте программу
+model = nn.RNN(2, 2, bias=False, batch_first=True)
+model.weight_hh_l0.data = torch.tensor([[rx, 0], [0, ry]], dtype=torch.float32)
+model.weight_ih_l0.data = torch.tensor([[sigma_noise_x, 0], [0, sigma_noise_y]], dtype=torch.float32)
+model.eval()
+
+x, _ = model(noise.view(1, total, 2), h0.view(1, 1, 2))
