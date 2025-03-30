@@ -1,0 +1,24 @@
+import torch
+import torch.nn as nn
+
+
+class RNNModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.rnn = nn.RNN(32, 12, batch_first=True, bidirectional=True)
+        self.out = nn.Linear(24, 5)
+
+    def forward(self, x):
+        _, h = self.rnn(x)
+        y = torch.cat([h[0], h[1]], dim=1)
+        return self.out(y)
+
+
+batch_size = 8
+seq_length = 12
+d_size = 32
+x = torch.rand(batch_size, seq_length, d_size)
+
+model = RNNModel()
+model.eval()
+predict = model(x)
