@@ -1,0 +1,14 @@
+import torch
+
+def sigma(x):
+    return 1 / (1 + torch.exp(-x))
+
+
+# все эти переменные в программе не менять
+W = torch.rand(3) * 10 - 5
+bias = torch.rand(1) * 100 - 50
+
+batch_size = 8 # размер мини-батча
+X = torch.empty(batch_size, 3).normal_(mean=1.0, std=4.0)
+
+predict = sigma(torch.matmul(X, W) + bias)
