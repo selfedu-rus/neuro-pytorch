@@ -1,0 +1,41 @@
+import torch
+import torch.nn as nn
+import torch.utils.data as data
+
+
+# здесь объявляйте класс CharsDataset
+class CharsDataset(data.Dataset):
+    def __init__(self, prev_chars=7):
+        self.prev_chars = prev_chars
+
+        self.lines = _global_var_text
+        self.alphabet = set(("".join(self.lines)).lower())
+        self.int_to_alpha = dict(enumerate(sorted(self.alphabet)))
+        self.alpha_to_int = {b: a for a, b in self.int_to_alpha.items()}
+        self.num_characters = len(self.alphabet)
+        self.onehots = torch.eye(self.num_characters)
+
+        data = []
+        targets = []
+
+        for i, t in enumerate(self.lines):
+            t = t.lower()
+            for item in range(len(t)-self.prev_chars):
+                data.append([self.alpha_to_int[t[x]] for x in range(item, item + self.prev_chars)])
+                targets.append(self.alpha_to_int[t[item+self.prev_chars]])
+
+        self.data = torch.tensor(data)
+        self.targets = torch.tensor(targets)
+
+        self.length = len(data)
+
+    def __getitem__(self, item):
+        return self.onehots[self.data[item]], self.targets[item]
+
+    def __len__(self):
+        return self.length
+
+
+# здесь продолжайте программу
+d_train = CharsDataset(prev_chars=10)
+train_data = data.DataLoader(d_train, batch_size=8, shuffle=True)
