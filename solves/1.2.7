@@ -1,0 +1,11 @@
+import numpy as np
+
+x = list(map(int, input().split())) # чтение вектора [x1, x2, x3] из входного потока
+
+W1 = np.array([[3/2, 3/2, 4]])
+b1 = np.array([[-5]])
+
+x = np.array([x])
+y = W1 @ x.T + b1
+
+print(f"{y.item():.2f}") # вывод выходного значения y с точностью до сотых
