@@ -1,0 +1,11 @@
+import torch
+
+# переменные lst и t_box_lst в программе не менять
+lst = list(map(float, input().split()))
+t_box_lst = torch.tensor(lst, dtype=torch.int32).view(-1, 3)
+
+t_box_vol = torch.prod(t_box_lst, dim=1)
+
+t_mean_vol = torch.mean(t_box_vol.float()).item()
+t_min_vol = torch.min(t_box_vol[t_box_vol > t_mean_vol]).item()
+t_max_vol = torch.max(t_box_vol[t_box_vol < t_mean_vol]).item()
