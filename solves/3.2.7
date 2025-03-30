@@ -1,0 +1,9 @@
+import torch
+import torch.nn as nn
+
+H, W = 32, 25
+x = torch.randint(0, 255, (H, W), dtype=torch.float32) # тензор x в программе не менять
+
+# здесь продолжайте программу
+lr = nn.MaxPool2d((3, 2))
+t_out = lr(x.view(1, 1, H, W))
