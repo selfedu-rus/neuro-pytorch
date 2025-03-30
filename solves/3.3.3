@@ -1,0 +1,32 @@
+import torch
+import torch.utils.data as data
+import torch.nn as nn
+import torch.optim as optim
+
+ds = data.TensorDataset(_global_var_data_x, _global_var_target) # обучающие данные
+
+model = nn.Sequential(
+    nn.Conv2d(1, 32, 3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.MaxPool2d(2),
+    nn.Conv2d(32, 16, 3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.MaxPool2d(2),
+    nn.Flatten(),
+    nn.Linear(64, 10)
+)
+
+ds = data.TensorDataset(_global_var_data_x, _global_var_target)
+test_data = data.DataLoader(ds, batch_size=len(ds), shuffle=False)
+
+model.load_state_dict(_global_model_state)
+
+model.eval()
+
+x_test, y_test = next(iter(test_data))
+with torch.no_grad():
+    p = model(x_test)
+    p = torch.argmax(p, dim=1)
+    Q = torch.sum(p.flatten() == y_test.flatten()).item()
+
+Q /= len(ds)
