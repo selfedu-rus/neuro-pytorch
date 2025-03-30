@@ -1,0 +1,44 @@
+import torch
+import torch.nn as nn
+import torch.utils.data as data
+
+class WordsDataset(data.Dataset):
+    def __init__(self, batch_size=8): # инициализатор класса
+        self.batch_size = batch_size
+
+        self.words_lst = [(_x, 0) for _x in _global_words_0] + [(_x, 1) for _x in _global_words_1]
+        self.words_lst.sort(key=lambda _x: len(_x[0]))
+        self.dataset_len = len(self.words_lst)
+
+        _text = "".join(_global_words_0 + _global_words_1).lower()
+        self.alphabet = set(_text)
+        self.int_to_alpha = dict(enumerate(sorted(self.alphabet)))
+        self.alpha_to_int = {b: a for a, b in self.int_to_alpha.items()}
+        self.num_characters = len(self.alphabet)
+        self.onehots = torch.eye(self.num_characters + 1, self.num_characters)
+
+    def __getitem__(self, item): # формирование и возвращение батча данных по индексу item
+        item *= self.batch_size
+        item_last = item + self.batch_size
+        if item_last > self.dataset_len:
+            item_last = self.dataset_len
+
+        max_length = len(self.words_lst[item_last - 1][0])
+
+        d = [[self.alpha_to_int[_x] for _x in _w[0]] + [-1] * (max_length - len(_w[0])) for _w in self.words_lst[item: item_last]]
+        t = torch.FloatTensor([_w[1] for _w in self.words_lst[item: item_last]])
+
+        data = torch.zeros(len(d), max_length, self.num_characters)
+        for i, indx in enumerate(d):
+            data[i, :, :] = self.onehots[indx]
+
+        return data, t
+
+    def __len__(self): # возврат размер обучающей выборки в батчах
+        last = 0 if self.dataset_len % self.batch_size == 0 else 1
+        return self.dataset_len // self.batch_size + last
+
+
+# здесь продолжайте программу
+d_train = WordsDataset(batch_size=8)
+train_data = data.DataLoader(d_train, batch_size=1, shuffle=True)
