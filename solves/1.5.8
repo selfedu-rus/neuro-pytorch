@@ -1,0 +1,5 @@
+import torch
+
+t1 = torch.empty(3, 10, 2, dtype=torch.float32).uniform_(-2, 10)
+t2 = torch.empty(123, dtype=torch.float32).random_(13, 20)
+t3 = torch.empty(8, 1024, dtype=torch.float32).normal_(23, 50)
