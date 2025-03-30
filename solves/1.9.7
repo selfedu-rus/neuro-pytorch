@@ -1,0 +1,20 @@
+import torch
+
+def sigma(x):
+    return 1 / (1 + torch.exp(-x))
+
+
+# значения списков w и g в программе не менять
+w = list(map(float, input().split()))
+g = list(map(float, input().split()))
+
+t_inp = torch.rand(3) * 10
+
+W1 = torch.tensor(w, dtype=torch.float32).view(2, -1)
+bias1 = W1[:, 0]
+W1 = W1[:, 1:]
+W2 = torch.tensor([g[1:]], dtype=torch.float32)
+bias2 = torch.tensor(g[0], dtype=torch.float32)
+
+u = sigma(W1 @ t_inp + bias1)
+y = W2 @ u + bias2
