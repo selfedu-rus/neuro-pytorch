@@ -1,0 +1,24 @@
+import torch
+import torch.nn as nn
+
+# здесь объявляйте класс LSTMToLinear
+class LSTMToLinear(nn.Module):
+    def forward(self, x):
+        return x[1][0].squeeze(0)
+    
+
+# тензор x в программе не менять
+batch_size = 18
+seq_length = 21
+in_features = 5
+x = torch.rand(batch_size, seq_length, in_features)
+
+# здесь продолжайте программу
+model = nn.Sequential(
+    nn.LSTM(in_features, 25, batch_first=True),
+    LSTMToLinear(),
+    nn.Linear(25, 5)
+)
+
+model.eval()
+res = model(x)
