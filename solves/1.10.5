@@ -1,0 +1,8 @@
+import torch
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+targets = torch.rand(1000).to(device)
+predict = torch.rand(1000).to(device)
+
+Q = torch.mean((predict - targets) ** 2).cpu()
