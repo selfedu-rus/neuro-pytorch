@@ -1,0 +1,29 @@
+import torch
+import torch.nn as nn
+
+# здесь объявляйте класс модели
+class BasicBlock(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.bb = nn.Sequential(
+            nn.Conv2d(64, 64, 3, padding=1, bias=False),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 64, 3, padding=1, bias=False),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        f = self.bb(x)
+        return f + x
+
+
+batch_size = 8
+x = torch.rand(batch_size, 64, 32, 32) # тензор x в программе не менять
+
+# здесь продолжайте программу
+model_bb = BasicBlock()
+model_bb.eval()
+
+y = model_bb(x)
