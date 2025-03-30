@@ -1,0 +1,10 @@
+import torch
+import torch.nn as nn
+
+C = 24         # число входных каналов
+H, W = 128, 86 # размеры карт признаков
+x = torch.randint(0, 255, (C, H, W), dtype=torch.float32) # тензор x в программе не менять
+
+# здесь продолжайте программу
+lr = nn.MaxPool2d((3, 4), (2, 1))
+t_out = lr(x.view(1, C, H, W))
