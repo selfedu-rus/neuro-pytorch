@@ -9,7 +9,7 @@ class OutputModule(nn.Module):
         self.layer = nn.Linear(25, 10)
 
     def forward(self, x):
-        y = self.act(self.layer(x[0]))
+        y = self.layer(self.act(x[0]))
         return y
 
 
