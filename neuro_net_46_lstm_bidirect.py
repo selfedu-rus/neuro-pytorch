@@ -76,7 +76,7 @@ class WordsRNN(nn.Module):
         self.in_features = in_features
         self.out_features = out_features
 
-        self.rnn = nn.RNN(in_features, self.hidden_size, batch_first=True, bidirectional=True)
+        self.rnn = nn.LSTM(in_features, self.hidden_size, batch_first=True, bidirectional=True)
         self.out = nn.Linear(self.hidden_size * 2, out_features)
 
     def forward(self, x):
