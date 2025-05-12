@@ -14,4 +14,4 @@ h_log_var = torch.rand(batch_size, 10)
 
 # здесь продолжайте программу
 loss_func = KLLoss()
-loss = loss_func(h_mean, h_log_var)
+loss = loss_func(h_mean, h_log_var).item()
